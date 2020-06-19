@@ -1,0 +1,5 @@
+javac -cp .;.ojdbc8.jar joy222.java
+
+jar cfmv joy222.jar Manifest.txt joy222.class
+
+java -jar joy222.jar

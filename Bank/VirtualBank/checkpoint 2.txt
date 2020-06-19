@@ -1,0 +1,202 @@
+create table Account -- done, info added
+(
+	acctnum number(25,0) not null,
+	accttype varchar(2) constraint c_accttype check(accttype in ('CA', 'SA', 'ca', 'sa', 'Ca', 'Sa', 'cA', 'sA')),
+	acctbal number(25,0),
+	acctID varchar(25),
+	primary key (acctnum)
+);
+
+create table has --RELATION.. USE CUSTID FROM CUSTOMER AND ACCTNUM FROM ACCOUNT
+(
+	custID varchar(25),
+	acctnum number (25, 0),
+	primary key (custID),
+	foreign key (custId) references Customer,
+	foreign key (acctnum) references Account,
+);
+
+create table Customer -- info added
+(
+	custID varchar (25),
+	custname varchar(25),
+	custaddr varchar(30),
+	primary key(custID)
+);
+
+
+create table CheckingAcct -- USE ACCTNUM FROM ACCOUNT , info added
+(
+	acctnum number(25,0),
+	debitID varchar(25), --Lxx xLL
+	overdraft varchar(25),
+	primary key (acctnum),
+	foreign key(acctnum) references Account on delete cascade
+);
+
+--create table debitAccount -- USE ACCT FROM ACCOUNT --WHY DO I NEED A DEBIT ACCOUNT?
+(
+	acctnum number(25,0),
+	balance number (10,0),
+	primary key (acctnum),
+	foreign key (acctnum) references Account on delete cascade
+);
+
+create table DebitCard --2~12 USE CARDID FROM CARD ONLY DCS!!, info added
+(
+	cardID number (25, 0),
+	dcardnum number (16, 0),
+	primary key (cardID)
+);
+
+create table SavingsAcct-- USE ACCTNUM FROM SA ACCOUNT, info added
+(
+	acctnum number(25,0), --2~13 SA from acct
+	interest number(25, 0),
+	minbal number(5,0), -- 200 for now
+	minbalfee number (5, 0), -- 30 for now
+	primary key (acctnum),
+	foreign key (acctnum) references Account on delete cascade
+);
+	
+create table Card-- info added
+(
+	cardnum number(16, 0),
+	cardID number (25, 0),
+	cardtype varchar(2) constraint c_cardtype check (cardtype in ('DC', 'CC', 'dC', 'cC', 'Dc', 'Cc')),
+	cardexp varchar(4),
+	primary key (cardnum)
+);
+
+
+create table CreditCard --USE LOANID FROM LOAN AND ONLY CCS FROM CARD
+(
+	cardID number (25, 0), --card from 1~9
+	ccardnum number(16, 0),
+	cardbal number (25, 0),
+	paymentdate varchar(12),
+	loanID number (25, 0), --loan from 2-9
+	creditlim number (25, 0),
+	primary key (cardID),
+	foreign key (loanID) references Loan
+);
+
+--create table creditAccount DO I NEED THIS?
+(
+	cardID number (25, 0),
+	loanID number (25, 0),
+	primary key (loanID),
+	foreign key (cardID) references CreditCard,
+	foreign key (cardID) references Card,
+	foreign key (loanID) references Loan	
+);
+
+create table Loan -- USE ACCOUNT ACCTNUM
+(
+	loanID number (25, 0), 
+	acctnum number (25, 2), -- FROM ACCOUNTS
+	payment number (25, 2),
+	loantype varchar(2) constraint c_loantype check (loantype in ('UL', 'SL', 'Ul', 'sL', 'Ul', 'Sl', 'ul', 'sl')),
+	loanamt number (25, 2), -- 100000~999999
+	intrate number (3, 2),
+	primary key (loanID),
+	foreign key (acctnum) references Account
+);
+
+--create table SecuredLoan -- NOT SURE HOW TO ADD SECURED AND UNSECURED
+(
+	securedID number (25, 0),
+	loantype varchar(2)
+	primary key (securedID) 
+);	
+
+--create table UnsecuredLoan
+(
+	unsecuredID number (25, 0),
+	loantype varchar(1),
+	primary key (unsecuredID),
+	foreign key (unsecuredID) references creditAccount
+)	
+
+create table LoanPayment -- USE LOANID FROM LOAN, info added
+(
+	paymentID number (25, 0), --1000~9999
+	loanID number (25, 0),
+	primary key (paymentID),
+	foreign key (loanID) references Loan
+);
+
+create table Payment --USE PAYMENTID FROM LOANPAYMENT
+(
+	paymentnum number (25, 0),
+	paymentID number (25, 0),
+	paydate varchar (8),
+	payamt number (25, 2),
+	primary key (paymentnum),
+	foreign key (paymentID) references LoanPayment
+);
+
+
+create table Branch -- info added
+(
+	branchID number (25, 0),
+	branchloc varchar (25),
+	branchname varchar (25),
+	branchtype varchar (1) constraint c_branchtype check (branchtype in ('A', 'T', 'B', 'a', 't', 'b')),
+	primary key (branchID)
+);
+
+create table at 
+(
+	branchID number (25, 0),
+	transactionID number (25, 0),
+	primary key (branchID),
+	foreign key (branchID) references Branch,
+	foreign key (transactionID) references Transaction
+);
+
+create table Transaction --
+(
+	transactionID number (25, 0), --1000~9999
+	transtype varchar(1) constraint c_transtype check (transtype in ('W', 'D', 'C', 'w', 'd', 'c')),
+	transamt number (25, 0),
+	transdate varchar(8),
+	primary key (transactionID)
+);
+
+create table happens
+(
+	transactionID number (25, 0),
+	acctnum number (25, 0),
+	primary key (transactionID),
+	foreign key (transactionID) references Transaction,
+	foreign key (acctnum) references Account
+);
+
+create table withdrawl
+(
+	transactionID number (25, 0),
+	primary key (transactionID),
+	foreign key (transactionID) references Transaction
+);
+
+create table Deposit
+(
+	transactionID number (25, 0),
+	primary key (transactionID),
+	foreign key (transactionID) references Transaction
+);
+
+create table CheckBalance
+(
+	transactionID number (25, 0),
+	primary key (transactionID),
+	foreign key (transactionID) references Transaction
+);
+
+
+	
+
+
+
+

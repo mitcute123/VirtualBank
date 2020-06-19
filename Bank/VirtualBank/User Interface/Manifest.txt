@@ -1,0 +1,2 @@
+Main-class: joy222
+Class-Path: ojdbc8.jar
